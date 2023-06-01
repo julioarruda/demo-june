@@ -1,0 +1,37 @@
+# crie um pipeline no GitHub Actions para fazer o build de uma aplicação em .net 6
+
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Publish
+      run: dotnet publish --no-restore --no-build --configuration Release --output ./publish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: publish
+        path: ./publish
